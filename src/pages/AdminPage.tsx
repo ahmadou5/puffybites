@@ -1,0 +1,549 @@
+import React, { useState, useEffect } from "react";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Save,
+  X,
+  Package,
+  DollarSign,
+  Users,
+  TrendingUp,
+} from "lucide-react";
+import { dessertsAPI, ordersAPI } from "@/lib/supabase";
+import type { Dessert, Order, DessertFormData, OrderStats } from "@/types";
+
+type AdminTab = "desserts" | "orders";
+
+const AdminPage: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<AdminTab>("desserts");
+  const [desserts, setDesserts] = useState<Dessert[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [editingDessert, setEditingDessert] = useState<Dessert | null>(null);
+  const [showAddForm, setShowAddForm] = useState<boolean>(false);
+
+  const [dessertForm, setDessertForm] = useState<DessertFormData>({
+    name: "",
+    description: "",
+    pack_of: "",
+    price_cents: "",
+    image: "",
+    ingredients: "",
+    tags: "",
+    is_featured: false,
+    in_stock: true,
+  });
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [dessertsData, ordersData] = await Promise.all([
+        dessertsAPI.getAll(),
+        ordersAPI.getAll(),
+      ]);
+      setDesserts(dessertsData);
+      setOrders(ordersData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDessertSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
+    e.preventDefault();
+    try {
+      const dessertData = {
+        ...dessertForm,
+        price_cents: parseInt(dessertForm.price_cents),
+        pack_of: parseInt(dessertForm.pack_of),
+        tags: dessertForm.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+      };
+
+      if (editingDessert) {
+        const updated = await dessertsAPI.update(
+          editingDessert.id,
+          dessertData
+        );
+        setDesserts((prev) =>
+          prev.map((d) => (d.id === editingDessert.id ? updated : d))
+        );
+        setEditingDessert(null);
+      } else {
+        const newDessert = await dessertsAPI.create(dessertData);
+        setDesserts((prev) => [newDessert, ...prev]);
+        setShowAddForm(false);
+      }
+
+      setDessertForm({
+        name: "",
+        description: "",
+        pack_of: "",
+        price_cents: "",
+        image: "",
+        ingredients: "",
+        tags: "",
+        is_featured: false,
+        in_stock: true,
+      });
+    } catch (error) {
+      console.error("Error saving dessert:", error);
+      alert("Error saving dessert. Please try again.");
+    }
+  };
+
+  const handleEditDessert = (dessert: Dessert): void => {
+    setEditingDessert(dessert);
+    setDessertForm({
+      name: dessert.name,
+      description: dessert.description,
+      pack_of: dessert.pack_of.toString(),
+      price_cents: dessert.price_cents.toString(),
+      image: dessert.image || "",
+      ingredients: dessert.ingredients || "",
+      tags: Array.isArray(dessert.tags) ? dessert.tags.join(", ") : "",
+      is_featured: dessert.is_featured,
+      in_stock: dessert.in_stock,
+    });
+  };
+
+  const handleDeleteDessert = async (id: number): Promise<void> => {
+    if (window.confirm("Are you sure you want to delete this dessert?")) {
+      try {
+        await dessertsAPI.delete(id);
+        setDesserts((prev) => prev.filter((d) => d.id !== id));
+      } catch (error) {
+        console.error("Error deleting dessert:", error);
+        alert("Error deleting dessert. Please try again.");
+      }
+    }
+  };
+
+  const getOrderStats = (): OrderStats => {
+    const totalRevenue = orders.reduce(
+      (sum, order) => sum + ((order.total_cents || 0) / 100),
+      0
+    );
+    const totalOrders = orders.length;
+    const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+    return {
+      totalRevenue,
+      totalOrders,
+      avgOrderValue,
+      totalDesserts: desserts.length,
+    };
+  };
+
+  const stats = getOrderStats();
+
+  if (loading) {
+    return (
+      <div className="py-16 bg-puffy-light min-h-screen">
+        <div className="container-custom flex justify-center items-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-puffy-primary"></div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="py-12 min-h-screen px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            Admin Dashboard
+          </h1>
+          <p className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
+            Manage your desserts and view orders
+          </p>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 shadow-lg border border-gray-300 dark:border-gray-600">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 font-medium uppercase tracking-wide">
+                  Total Revenue
+                </p>
+                <p className="text-3xl font-bold text-primary">
+                  ₦{stats.totalRevenue.toFixed(2)}
+                </p>
+              </div>
+              <DollarSign className="w-10 h-10 text-primary" />
+            </div>
+          </div>
+
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 shadow-lg border border-gray-300 dark:border-gray-600">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 font-medium uppercase tracking-wide">
+                  Total Orders
+                </p>
+                <p className="text-3xl font-bold text-secondary">
+                  {stats.totalOrders}
+                </p>
+              </div>
+              <Users className="w-10 h-10 text-secondary" />
+            </div>
+          </div>
+
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 shadow-lg border border-gray-300 dark:border-gray-600">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 font-medium uppercase tracking-wide">
+                  Avg Order Value
+                </p>
+                <p className="text-3xl font-bold text-primary">
+                  ₦{stats.avgOrderValue.toFixed(2)}
+                </p>
+              </div>
+              <TrendingUp className="w-10 h-10 text-primary" />
+            </div>
+          </div>
+
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 shadow-lg border border-gray-300 dark:border-gray-600">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 font-medium uppercase tracking-wide">
+                  Total Desserts
+                </p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                  {stats.totalDesserts}
+                </p>
+              </div>
+              <Package className="w-10 h-10 text-gray-900 dark:text-white" />
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg shadow-lg border border-gray-300 dark:border-gray-700">
+          <div className="border-b border-gray-200">
+            <nav className="flex space-x-8 px-6">
+              <button
+                onClick={() => setActiveTab("desserts")}
+                className={`py-4 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === "desserts"
+                    ? "border-puffy-primary text-puffy-primary"
+                    : "border-transparent text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                Manage Desserts
+              </button>
+              <button
+                onClick={() => setActiveTab("orders")}
+                className={`py-4 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === "orders"
+                    ? "border-puffy-primary text-puffy-primary"
+                    : "border-transparent text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                View Orders
+              </button>
+            </nav>
+          </div>
+
+          <div className="p-6">
+            {activeTab === "desserts" && (
+              <div>
+                {/* Add Dessert Button */}
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-semibold text-puffy-dark">
+                    Desserts Management
+                  </h2>
+                  <button
+                    onClick={() => setShowAddForm(true)}
+                    className="btn-primary flex items-center space-x-2"
+                  >
+                    <Plus size={18} />
+                    <span>Add New Dessert</span>
+                  </button>
+                </div>
+
+                {/* Add/Edit Form */}
+                {(showAddForm || editingDessert) && (
+                  <div className="bg-gray-50 rounded-lg p-6 mb-6">
+                    <form onSubmit={handleDessertSubmit} className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input
+                          type="text"
+                          placeholder="Dessert Name *"
+                          value={dessertForm.name}
+                          onChange={(e) =>
+                            setDessertForm((prev) => ({
+                              ...prev,
+                              name: e.target.value,
+                            }))
+                          }
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-puffy-primary"
+                          required
+                        />
+                        <input
+                          type="number"
+                          step="0.01"
+                          placeholder="Price *"
+                          value={dessertForm.price_cents}
+                          onChange={(e) =>
+                            setDessertForm((prev) => ({
+                              ...prev,
+                              price_cents: e.target.value,
+                            }))
+                          }
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-puffy-primary"
+                          required
+                        />
+                      </div>
+
+                      <textarea
+                        placeholder="Description *"
+                        value={dessertForm.description}
+                        onChange={(e) =>
+                          setDessertForm((prev) => ({
+                            ...prev,
+                            description: e.target.value,
+                          }))
+                        }
+                        rows={3}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-puffy-primary"
+                        required
+                      />
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input
+                          type="text"
+                          placeholder="Image URL"
+                          value={dessertForm.image}
+                          onChange={(e) =>
+                            setDessertForm((prev) => ({
+                              ...prev,
+                              image: e.target.value,
+                            }))
+                          }
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-puffy-primary"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Tags (comma separated)"
+                          value={dessertForm.tags}
+                          onChange={(e) =>
+                            setDessertForm((prev) => ({
+                              ...prev,
+                              tags: e.target.value,
+                            }))
+                          }
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-puffy-primary"
+                        />
+                      </div>
+
+                      <input
+                        type="text"
+                        placeholder="Main Ingredients"
+                        value={dessertForm.ingredients}
+                        onChange={(e) =>
+                          setDessertForm((prev) => ({
+                            ...prev,
+                            ingredients: e.target.value,
+                          }))
+                        }
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-puffy-primary"
+                      />
+
+                      <div className="flex items-center space-x-6">
+                        <label className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={dessertForm.is_featured}
+                            onChange={(e) =>
+                              setDessertForm((prev) => ({
+                                ...prev,
+                                is_featured: e.target.checked,
+                              }))
+                            }
+                            className="mr-2"
+                          />
+                          Featured Dessert
+                        </label>
+                        <label className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={dessertForm.in_stock}
+                            onChange={(e) =>
+                              setDessertForm((prev) => ({
+                                ...prev,
+                                in_stock: e.target.checked,
+                              }))
+                            }
+                            className="mr-2"
+                          />
+                          In Stock
+                        </label>
+                      </div>
+
+                      <div className="flex space-x-4">
+                        <button
+                          type="submit"
+                          className="btn-primary flex items-center space-x-2"
+                        >
+                          <Save size={18} />
+                          <span>
+                            {editingDessert ? "Update" : "Add"} Dessert
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowAddForm(false);
+                            setEditingDessert(null);
+                            setDessertForm({
+                              name: "",
+                              description: "",
+                              pack_of: "",
+                              price_cents: "",
+                              image: "",
+                              ingredients: "",
+                              tags: "",
+                              is_featured: false,
+                              in_stock: true,
+                            });
+                          }}
+                          className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
+                        >
+                          <X size={18} />
+                          <span>Cancel</span>
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+
+                {/* Desserts List */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {desserts.map((dessert) => (
+                    <div
+                      key={dessert.id}
+                      className="bg-white border border-gray-200 rounded-lg overflow-hidden"
+                    >
+                      <img
+                        src={dessert.image || "/api/placeholder/300/200"}
+                        alt={dessert.name}
+                        className="w-full h-32 object-cover"
+                      />
+                      <div className="p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <h3 className="font-semibold text-puffy-dark">
+                            {dessert.name}
+                          </h3>
+                          <span className="text-puffy-primary font-bold">
+                            ₦{(dessert.price_cents / 100).toFixed(2)}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                          {dessert.description}
+                        </p>
+                        <div className="flex justify-between items-center">
+                          <div className="flex space-x-2">
+                            {dessert.is_featured && (
+                              <span className="px-2 py-1 bg-puffy-accent text-xs rounded">
+                                Featured
+                              </span>
+                            )}
+                            <span
+                              className={`px-2 py-1 text-xs rounded ${
+                                dessert.in_stock
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-red-100 text-red-800"
+                              }`}
+                            >
+                              {dessert.in_stock ? "In Stock" : "Out of Stock"}
+                            </span>
+                          </div>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => handleEditDessert(dessert)}
+                              className="text-blue-600 hover:text-blue-800 p-1"
+                            >
+                              <Edit size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteDessert(dessert.id)}
+                              className="text-red-600 hover:text-red-800 p-1"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === "orders" && (
+              <div>
+                <h2 className="text-xl font-semibold text-puffy-dark mb-6">
+                  Recent Orders
+                </h2>
+                <div className="space-y-4">
+                  {orders.map((order) => (
+                    <div key={order.id} className="bg-gray-50 rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h3 className="font-semibold text-puffy-dark">
+                            Order #{order.id} - {order.customer_info?.firstName}{" "}
+                            {order.customer_info?.lastName}
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            {order.customer_info?.email}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-lg font-bold text-puffy-primary">
+                            ₦{(order.total_cents / 100).toFixed(2)}
+                          </span>
+                          <p className="text-sm text-gray-500">
+                            {new Date(
+                              order.created_at as unknown as Date
+                            ).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        <p className="font-medium">Items:</p>
+                        {order.order_items?.map((item, index) => (
+                          <span key={index}>
+                            {item.name} x{item.quantity}
+                            {index < (order.order_items?.length || 0) - 1 ? ", " : ""}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                  {orders.length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      No orders found
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminPage;
