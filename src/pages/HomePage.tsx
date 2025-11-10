@@ -7,6 +7,7 @@ import {
   Award,
   ChevronLeft,
   ChevronRight,
+  ArrowRight,
 } from "lucide-react";
 import { dessertsAPI } from "@/lib/supabase";
 import DessertCard from "@/components/DessertCard/DessertCard";
@@ -144,13 +145,18 @@ const HomePage: React.FC = () => {
       {/* Featured Desserts */}
       <section id="featured" className="py-20 px-6 lg:px-8 ">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-              Featured Desserts
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              Try our most popular and chef-recommended treats
-            </p>
+          <div className="text-center bg-white/0 flex w-[100%] ml-auto mr-auto h-12 mb-16">
+            <div className="py-2 px-5">
+              <h2 className="text-xl lg:text-3xl text-start font-bold text-gray-900 dark:text-white">
+                Top picks
+              </h2>
+            </div>
+            <div className="py-2 ml-auto flex px-5 hover:border border-primary/30 rounded-xl hover:bg-primary/30 backdrop-blur-md">
+              <p className="ml-3 mr-2 py-1 font-bold text-base">View all</p>
+              <div className="w-8 h-8 py-1 px-2 flex items-center bg-primary/20 border backdrop-blur-md border-primary/30 rounded-xl">
+                <ArrowRight />
+              </div>
+            </div>
           </div>
 
           {loading ? (
@@ -158,9 +164,9 @@ const HomePage: React.FC = () => {
               <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary border-t-transparent"></div>
             </div>
           ) : (
-            <div className="relative mb-16">
+            <div className="w-full flex mb-16">
               {/* Desktop Controls */}
-              <div className="hidden lg:block px-5">
+              <div className="hidden lg:flex ml-auto mr-auto px-5">
                 <div className="relative">
                   {/* Previous Button */}
 

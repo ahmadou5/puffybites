@@ -18,7 +18,7 @@ const DessertCard: React.FC<DessertCardProps> = ({
   };
 
   return (
-    <div className="relative backdrop-blur-mmd rounded-3xl border border-primary/40 shadow-lg hover:shadow-2xl transition-all duration-500 ease-out overflow-hidden group hover:-translate-y-2 hover:scale-[1.02]">
+    <div className="relative backdrop-blur-md rounded-3xl border border-primary/40 shadow-lg hover:shadow-2xl transition-all duration-500 ease-out overflow-hidden group hover:-translate-y-2 hover:scale-[1.02]">
       {/* Image Section */}
       <div className="relative h-56 overflow-hidden">
         <img
@@ -36,7 +36,7 @@ const DessertCard: React.FC<DessertCardProps> = ({
 
         {/* Featured Badge - Top Right */}
         {dessert.is_featured && (
-          <div className="absolute top-4 right-4 dark:bg-primary/20 bg-primary/40 text-white px-3 py-2 rounded-full text-xs font-semibold uppercase tracking-wide shadow-lg">
+          <div className="absolute top-4 right-4 dark:bg-primary/20 bg-primary/40 backdrop-blur-md text-white px-3 py-2 rounded-full text-xs font-semibold uppercase tracking-wide shadow-lg">
             ⭐ Featured
           </div>
         )}
