@@ -10,7 +10,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <FluidBackground />
       <div className="relative z-10">
         <Header />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 mt-3">{children}</main>
         <Footer />
       </div>
     </div>

@@ -18,7 +18,7 @@ const DessertCard: React.FC<DessertCardProps> = ({
   };
 
   return (
-    <div className="relative backdrop-blur-md rounded-3xl border border-primary/40 shadow-lg hover:shadow-2xl transition-all duration-500 ease-out overflow-hidden group hover:-translate-y-2 hover:scale-[1.02]">
+    <div className="relative backdrop-blur-md  rounded-3xl border border-primary/40 shadow-lg hover:shadow-2xl transition-all duration-500 ease-out overflow-hidden group hover:-translate-y-2 hover:scale-[1.02]">
       {/* Image Section */}
       <div className="relative h-56 overflow-hidden">
         <img

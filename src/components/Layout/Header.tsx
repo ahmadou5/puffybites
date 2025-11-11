@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ShoppingCart, Menu, X, Moon, Sun } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useTheme } from "@/context/ThemeContext";
+import { cn } from "@/lib/utils";
 
 interface NavigationItem {
   name: string;
@@ -11,6 +12,7 @@ interface NavigationItem {
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [scrolled, setScrolled] = useState(false);
   const { getItemCount } = useCart();
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
@@ -22,9 +24,23 @@ const Header: React.FC = () => {
   ];
 
   const isActive = (path: string): boolean => location.pathname === path;
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 5);
+    };
 
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
   return (
-    <header className=" backdrop-blur-md sticky top-0 z-50">
+    <header
+      className={cn(
+        "fixed top-0 z-50 w-full transition-colors duration-200",
+        scrolled
+          ? "lg:bg-black/0 bg-black/0 lg:backdrop-blur-md backdrop-blur-md"
+          : "lg:bg-transparent backdrop-blur-md bg-black/0"
+      )}
+    >
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -92,22 +108,16 @@ const Header: React.FC = () => {
 
         {/* Mobile Navigation Overlay */}
         {isMenuOpen && (
-          <>
-            {/* Backdrop */}
-            <div
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
-              onClick={() => setIsMenuOpen(false)}
-            />
-
+          <div className="flex items-center  w-full h-auto left-0 right-0  backdrop-blur-xl z-50 md:hidden">
             {/* Mobile Menu */}
-            <div className="absolute top-full left-0 right-0 bg-white/95 dark:bg-black/95 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50 shadow-lg z-50 md:hidden">
-              <nav className="flex flex-col py-4 px-6">
+            <div className="w-full">
+              <nav className="flex flex-col py-4 px-2">
                 {navigation.map((item, index) => (
                   <Link
                     key={item.name}
                     to={item.href}
                     onClick={() => setIsMenuOpen(false)}
-                    className={`font-medium transition-all duration-200 py-3 px-4 rounded-lg animate-fade-in-up ${
+                    className={`font-medium transition-all w-full duration-200 py-3 px-4 rounded-lg animate-fade-in-up ${
                       isActive(item.href)
                         ? "text-primary dark:text-primary-light bg-blue-50/80 dark:bg-blue-950/80"
                         : "text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-gray-50/80 dark:hover:bg-gray-900/80"
@@ -119,7 +129,7 @@ const Header: React.FC = () => {
                 ))}
               </nav>
             </div>
-          </>
+          </div>
         )}
       </div>
     </header>
