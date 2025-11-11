@@ -9,6 +9,7 @@ import {
   CreditCard,
   Copy,
   CheckCircle,
+  User2,
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { ordersAPI } from "@/lib/supabase";
@@ -126,24 +127,24 @@ const CheckoutPage: React.FC = () => {
       <div className="py-20 min-h-screen px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="max-w-4xl mx-auto">
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-12 shadow-lg border border-gray-300 dark:border-gray-600 mb-8">
+            <div className="backdrop-blur-xl rounded-xl lg:p-12 p-1  mb-8">
               <div className="text-center mb-8">
                 <div className="w-20 h-20 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-6">
                   <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
                 </div>
-                <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                <h1 className="lg:text-4xl text-2xl font-bold text-gray-900 dark:text-white mb-4">
                   Order Placed Successfully!
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400 text-lg">
+                <p className="text-gray-600 dark:text-gray-400 lg:text-lg text-base">
                   Please complete payment using the bank transfer details below.
                 </p>
               </div>
 
               {/* Bank Transfer Details */}
-              <div className="bg-white dark:bg-gray-700 rounded-lg p-8 border border-gray-200 dark:border-gray-600 mb-8">
+              <div className="backdrop-blur-xl rounded-lg lg:p-8 p-4  mb-8">
                 <div className="flex items-center mb-6">
                   <CreditCard className="w-6 h-6 text-primary mr-3" />
-                  <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  <h2 className="lg:text-2xl text-base font-semibold text-gray-900 dark:text-white">
                     Bank Transfer Details
                   </h2>
                 </div>
@@ -154,7 +155,7 @@ const CheckoutPage: React.FC = () => {
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Bank Name
                       </label>
-                      <div className="flex items-center justify-between p-3 bg-gray-100 dark:bg-gray-600 rounded-lg">
+                      <div className="flex items-center justify-between p-3 bg-primary/10 rounded-xl">
                         <span className="text-gray-900 dark:text-white font-medium">
                           Puffy Delights Bank
                         </span>
@@ -177,7 +178,7 @@ const CheckoutPage: React.FC = () => {
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Account Number
                       </label>
-                      <div className="flex items-center justify-between p-3 bg-gray-100 dark:bg-gray-600 rounded-lg">
+                      <div className="flex items-center justify-between p-3 bg-primary/10 rounded-xl">
                         <span className="text-gray-900 dark:text-white font-medium">
                           1234567890
                         </span>
@@ -200,7 +201,7 @@ const CheckoutPage: React.FC = () => {
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Account Name
                       </label>
-                      <div className="flex items-center justify-between p-3 bg-gray-100 dark:bg-gray-600 rounded-lg">
+                      <div className="flex items-center justify-between p-3 bg-primary/10 rounded-xl">
                         <span className="text-gray-900 dark:text-white font-medium">
                           Puffy Delights Ltd
                         </span>
@@ -225,14 +226,9 @@ const CheckoutPage: React.FC = () => {
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Amount
                       </label>
-                      <div className="flex items-center justify-between p-3 bg-gray-100 dark:bg-gray-600 rounded-lg">
+                      <div className="flex items-center justify-between p-3 bg-primary/10 rounded-xl">
                         <span className="text-gray-900 dark:text-white font-medium text-xl">
-                          $
-                          {(
-                            getTotal() +
-                            getTotal() * 0.08 +
-                            (getTotal() > 50 ? 0 : 5.99)
-                          ).toFixed(2)}
+                          ${getTotal()}
                         </span>
                         <button
                           onClick={() =>
@@ -298,15 +294,12 @@ const CheckoutPage: React.FC = () => {
                     <li>
                       • Your order will be processed once payment is confirmed
                     </li>
-                    <li>
-                      • You will receive a confirmation email within 24 hourshh
-                    </li>
                   </ul>
                 </div>
 
                 <button
                   onClick={() => navigate("/")}
-                  className="bg-primary text-white hover:bg-primary-dark px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="bg-primary text-white hover:bg-primary-dark lg:px-6 lg:py-3 px-4 py-2 text-lg font-semibold rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   Continue Shopping
                 </button>
@@ -324,19 +317,19 @@ const CheckoutPage: React.FC = () => {
       <div className="py-20  min-h-screen px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="max-w-2xl mx-auto text-center">
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-12 shadow-lg border border-gray-200 dark:border-gray-600">
-              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">
+            <div className="backdrop-blur-xl rounded-2xl lg:p-12 p-4 shadow-lg border border-gray-200 dark:border-gray-600">
+              <h1 className="lg:text-4xl text-2xl font-bold text-gray-900 dark:text-white mb-6">
                 Your Cart is Empty
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 mb-8 text-lg leading-relaxed">
-                Add some delicious desserts to your cart before proceeding to
+              <p className="text-gray-600 dark:text-gray-400 mb-8 lg:text-lg text-base leading-relaxed">
+                Add some creamy puffies to your cart before proceeding to
                 checkout.
               </p>
               <button
                 onClick={() => navigate("/order")}
-                className="bg-primary text-white hover:bg-primary-dark px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="bg-primary text-white hover:bg-primary-dark lg:px-8 lg:py-4 px-5 py-3 text-lg font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
               >
-                Browse Desserts
+                Browse Puffies
               </button>
             </div>
           </div>
@@ -356,7 +349,7 @@ const CheckoutPage: React.FC = () => {
         <div className="max-w-4xl mx-auto">
           {/* Order Summary at Top */}
           <div className="mb-8">
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-300 dark:border-gray-600 mb-6">
+            <div className=" backdrop-blur-md  rounded-2xl lg:p-6 p-3 shadow-lg border border-gray-300 dark:border-gray-600 mb-6">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                 Your Order
               </h2>
@@ -372,19 +365,19 @@ const CheckoutPage: React.FC = () => {
           {/* Order Form */}
           <form onSubmit={handleSubmitOrder} className="space-y-6">
             {/* Customer Information - Expandable */}
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm overflow-hidden">
+            <div className="backdrop-blur-xl py-2 px-2 rounded-2xl border border-gray-300 dark:border-gray-600 shadow-sm overflow-hidden">
               <button
                 type="button"
                 onClick={() => setIsUserInfoExpanded(!isUserInfoExpanded)}
-                className="w-full p-6 flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                className="w-full lg:p-6 p-2 flex items-center justify-between transition-colors duration-200"
               >
                 <div className="flex items-center">
-                  <User className="w-6 h-6 text-primary mr-3" />
+                  <User2 className="w-6 h-6 text-primary mr-3" />
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    Customer Information
+                    Customer Details
                   </h2>
                   {customerInfo.firstName && customerInfo.lastName && (
-                    <span className="ml-3 px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-sm rounded-full">
+                    <span className="ml-3 lg:px-3 px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-sm rounded-full">
                       ✓ Completed
                     </span>
                   )}
@@ -397,7 +390,7 @@ const CheckoutPage: React.FC = () => {
               </button>
 
               {isUserInfoExpanded && (
-                <div className="p-6 pt-0 border-t border-gray-200 dark:border-gray-600 animate-slide-down">
+                <div className="lg:p-6 p-3 pt-3 py-3 border-gray-200 dark:border-gray-600 animate-slide-down">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input
                       type="text"
@@ -410,7 +403,7 @@ const CheckoutPage: React.FC = () => {
                           e.target.value
                         )
                       }
-                      className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                      className="w-full lg:p-4 p-2 border border-primary/30 rounded-2xl bg-primary/10 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
                       required
                     />
                     <input
@@ -424,7 +417,7 @@ const CheckoutPage: React.FC = () => {
                           e.target.value
                         )
                       }
-                      className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                      className="w-full lg:p-4 p-2 border border-primary/30 rounded-2xl bg-primary/10 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
                       required
                     />
                     <input
@@ -434,7 +427,7 @@ const CheckoutPage: React.FC = () => {
                       onChange={(e) =>
                         handleInputChange("customer", "email", e.target.value)
                       }
-                      className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                      className="w-full lg:p-4 p-2 border border-primary/30 rounded-2xl bg-primary/10 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
                       required
                     />
                     <input
@@ -444,7 +437,7 @@ const CheckoutPage: React.FC = () => {
                       onChange={(e) =>
                         handleInputChange("customer", "phone", e.target.value)
                       }
-                      className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                      className="w-full lg:p-4 p-2 border border-primary/30 rounded-2xl bg-primary/10 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
                       required
                     />
                   </div>
@@ -453,18 +446,18 @@ const CheckoutPage: React.FC = () => {
             </div>
 
             {/* Delivery Information - Expandable */}
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm overflow-hidden">
+            <div className="backdrop-blur-xl py-2 px-2 rounded-2xl border border-gray-300 dark:border-gray-600 shadow-sm overflow-hidden">
               <button
                 type="button"
                 onClick={() =>
                   setIsDeliveryInfoExpanded(!isDeliveryInfoExpanded)
                 }
-                className="w-full p-6 flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                className="w-full lg:p-6 p-2 flex items-center justify-between transition-colors duration-200"
               >
                 <div className="flex items-center">
                   <Truck className="w-6 h-6 text-primary mr-3" />
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    Delivery Information
+                    Delivery Details
                   </h2>
                   {customerInfo.address && (
                     <span className="ml-3 px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-sm rounded-full">
@@ -480,7 +473,7 @@ const CheckoutPage: React.FC = () => {
               </button>
 
               {isDeliveryInfoExpanded && (
-                <div className="p-6 pt-0 border-t border-gray-200 dark:border-gray-600 animate-slide-down">
+                <div className="lg:p-6 p-3 pt-3 py-3  animate-slide-down">
                   <div className="grid grid-cols-1 gap-4">
                     <input
                       type="text"
@@ -489,7 +482,7 @@ const CheckoutPage: React.FC = () => {
                       onChange={(e) =>
                         handleInputChange("customer", "address", e.target.value)
                       }
-                      className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                      className="w-full lg:p-4 p-2 border border-primary/30 rounded-2xl bg-primary/10 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
                       required
                     />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -500,7 +493,7 @@ const CheckoutPage: React.FC = () => {
                         onChange={(e) =>
                           handleInputChange("customer", "city", e.target.value)
                         }
-                        className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                        className="w-full lg:p-4 p-2 border border-primary/30 rounded-2xl bg-primary/10 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
                         required
                       />
                       <input
@@ -514,7 +507,22 @@ const CheckoutPage: React.FC = () => {
                             e.target.value
                           )
                         }
-                        className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                        className="w-full lg:p-4 p-2 border border-primary/30 rounded-2xl bg-primary/10 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                        required
+                      />
+                    </div>
+                    <div className="mb-2">
+                      <label className="block text-sm ml-2 mr-2 font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Preferred Delivery Date *
+                      </label>
+                      <input
+                        type="date"
+                        value={deliveryDate}
+                        onChange={(e) =>
+                          handleInputChange("delivery", "date", e.target.value)
+                        }
+                        min={new Date().toISOString().split("T")[0]}
+                        className="w-full lg:p-4 p-2 border border-primary/30 rounded-2xl bg-primary/10 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
                         required
                       />
                     </div>
@@ -524,39 +532,16 @@ const CheckoutPage: React.FC = () => {
             </div>
 
             {/* Delivery Date & Payment */}
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 shadow-lg border border-gray-300 dark:border-gray-600">
-              <div className="flex items-center mb-6">
-                <Calendar className="w-6 h-6 text-primary mr-3" />
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Delivery Date & Payment
-                </h2>
-              </div>
-
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Preferred Delivery Date *
-                </label>
-                <input
-                  type="date"
-                  value={deliveryDate}
-                  onChange={(e) =>
-                    handleInputChange("delivery", "date", e.target.value)
-                  }
-                  min={new Date().toISOString().split("T")[0]}
-                  className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
-                  required
-                />
-              </div>
-
+            <div className="backdrop-blur-xl rounded-2xl lg:p-6 p-4 shadow-lg border border-gray-300 dark:border-gray-600">
               {/* Payment Information */}
-              <div className="mt-8">
+              <div className="mt-2">
                 <div className="flex items-center mb-6">
                   <CreditCard className="w-6 h-6 text-primary mr-3" />
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Payment Method
                   </h3>
                 </div>
-                <div className="bg-primary/10 dark:bg-primary/20 border border-primary/30 rounded-lg p-6">
+                <div className="bg-primary/10 dark:bg-primary/20 border border-primary/30 rounded-lg lg:p-6 p-3">
                   <h4 className="font-semibold text-gray-900 dark:text-white mb-3">
                     🏦 Bank Transfer
                   </h4>

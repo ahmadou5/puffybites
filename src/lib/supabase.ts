@@ -137,4 +137,19 @@ export const ordersAPI = {
     if (error) throw error;
     return data || [];
   },
+
+  // Update order status (admin only)
+  async updateStatus(id: number, status: string): Promise<Order> {
+    await simulateDelay();
+
+    const { data, error } = await supabase
+      .from("orders")
+      .update({ status })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
 };
