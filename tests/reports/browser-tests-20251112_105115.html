@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Browser Tests Report - 20251112_105115</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { background: #f4f4f4; padding: 15px; border-radius: 5px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .pass { color: green; } .fail { color: red; } .info { color: blue; }
+        .instructions { background: #e7f3ff; padding: 15px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Puffy Delights - Browser Tests Report</h1>
+        <p>Generated: 20251112_105115</p>
+        <p>Application URL: http://localhost:3001</p>
+    </div>
+    
+    <div class="instructions">
+        <h2>How to Run Browser Tests</h2>
+        <ol>
+            <li>Open your browser and navigate to <strong>http://localhost:3001</strong></li>
+            <li>Open Developer Tools (F12)</li>
+            <li>Go to the Console tab</li>
+            <li>Copy and paste the content from <code>tests/automated/browser-test-suite.js</code></li>
+            <li>Run: <code>const qa = new PuffyDelightsTestSuite(); qa.runAllTests();</code></li>
+            <li>Review the test results in the console</li>
+        </ol>
+    </div>
+    
+    <div class="test-section">
+        <h3>Quick Browser Test Commands</h3>
+        <pre>
+// Run all tests
+const qa = new PuffyDelightsTestSuite();
+qa.runAllTests();
+
+// Run specific test categories
+qa.runQuickTest('cart');
+qa.runQuickTest('performance');
+qa.runQuickTest('accessibility');
+        </pre>
+    </div>
+</body>
+</html>

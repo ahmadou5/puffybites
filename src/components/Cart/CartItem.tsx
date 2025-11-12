@@ -30,7 +30,9 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
         <h4 className="font-medium text-puffy-dark text-sm lg:text-md mb-2 truncate">
           {item.name}
         </h4>
-        <p className="text-sm text-gray-500">₦{item.price_cents / 100} each</p>
+        <p className="text-sm text-gray-500">
+          ₦{(item.price_cents / 100).toLocaleString()} each
+        </p>
       </div>
 
       {/* Quantity Controls */}
@@ -56,7 +58,7 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
         {/* Total & Remove */}
         <div className="lg:flex items-center flex-row  space-x-3">
           <span className="font-medium text-puffy-dark min-w-0">
-            ₦{(item.price_cents / 100) * item.quantity}
+            ₦{((item.price_cents / 100) * item.quantity).toLocaleString()}
           </span>
           <button
             onClick={() => removeItem(item.id)}

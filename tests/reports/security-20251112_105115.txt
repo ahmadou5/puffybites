@@ -1,0 +1,8 @@
+Security Test Results - 20251112_105115
+==============================
+
+HTTPS: Not enabled ⚠️
+X-Content-Type-Options: Missing ⚠️
+X-XSS-Protection: Missing ⚠️
+X-Frame-Options: Missing ⚠️
+Admin Protection: Not secured ❌

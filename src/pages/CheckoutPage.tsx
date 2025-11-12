@@ -13,6 +13,11 @@ import {
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { ordersAPI } from "@/lib/supabase";
+import {
+  emailService,
+  OrderEmailData,
+  AdminNotificationData,
+} from "@/lib/emailService";
 import CartSummary from "@/components/Cart/CartSummary";
 import CartItem from "@/components/Cart/CartItem";
 import type { CustomerInfo } from "@/types";
@@ -36,6 +41,7 @@ const CheckoutPage: React.FC = () => {
   const [orderPlaced, setOrderPlaced] = useState<boolean>(false);
   const [transactionRef, setTransactionRef] = useState<string>("");
   const [copySuccess, setCopySuccess] = useState<string>("");
+  const [orderTotal, setOrderTotal] = useState<number>(0);
   const [isUserInfoExpanded, setIsUserInfoExpanded] = useState<boolean>(true);
   const [isDeliveryInfoExpanded, setIsDeliveryInfoExpanded] =
     useState<boolean>(true);
@@ -91,17 +97,24 @@ const CheckoutPage: React.FC = () => {
 
     setLoading(true);
     try {
+      // Calculate and store the total before clearing cart
+      const subtotal = getTotal();
+      const tax = subtotal * 0.08;
+      const shipping = subtotal > 50 ? 0 : 5.99;
+      const finalTotal = subtotal + tax + shipping;
+
       const orderData = {
         customer_info: customerInfo,
-        total_cents: Math.round(
-          (getTotal() + getTotal() * 0.08 + (getTotal() > 50 ? 0 : 5.99)) * 100
-        ),
+        total_cents: Math.round(finalTotal * 100),
         delivery_date: deliveryDate,
         status: "pending" as const,
       };
 
       console.log("Creating order with data:", orderData);
       const order = await ordersAPI.create(orderData);
+
+      // Store the total before clearing cart
+      setOrderTotal(finalTotal);
 
       // Generate transaction reference if not provided by API
       const transactionRef =
@@ -111,6 +124,69 @@ const CheckoutPage: React.FC = () => {
           .substr(2, 6)
           .toUpperCase()}`;
       setTransactionRef(transactionRef);
+
+      // Prepare email dat
+      const orderEmailData: OrderEmailData = {
+        customerEmail: customerInfo.email,
+        customerName: customerInfo?.firstName,
+        orderId: order.id?.toString() || "UNKNOWN",
+        transactionRef: transactionRef,
+        orderItems: items.map((item) => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price_cents / 100,
+          pack_of: item.name,
+        })),
+        subtotal: subtotal,
+        tax: tax,
+        shipping: shipping,
+        total: finalTotal,
+        deliveryDate: deliveryDate,
+        customerAddress: customerInfo.address,
+        customerPhone: customerInfo.phone,
+      };
+
+      const adminNotificationData: AdminNotificationData = {
+        orderId: order.id?.toString() || "UNKNOWN",
+        customerName: customerInfo.firstName,
+        customerEmail: customerInfo.email,
+        total: finalTotal,
+        itemCount: items.reduce((sum, item) => sum + item.quantity, 0),
+        deliveryDate: deliveryDate,
+      };
+
+      // Send emails (don't wait for completion to avoid blocking UI)
+      Promise.all([
+        emailService.sendOrderConfirmation(orderEmailData),
+        emailService.sendAdminNotification(adminNotificationData),
+      ])
+        .then(([customerEmailResult, adminEmailResult]) => {
+          console.log("Customer email result:", customerEmailResult);
+          console.log("Admin email result:", adminEmailResult);
+
+          if (customerEmailResult.success) {
+            console.log("✅ Order confirmation email sent successfully");
+          } else {
+            console.warn(
+              "⚠️ Failed to send customer email:",
+              customerEmailResult.error
+            );
+          }
+
+          if (adminEmailResult.success) {
+            console.log("✅ Admin notification email sent successfully");
+          } else {
+            console.warn(
+              "⚠️ Failed to send admin email:",
+              adminEmailResult.error
+            );
+          }
+        })
+        .catch((error) => {
+          console.error("Email sending error:", error);
+          // Don't fail the order if emails fail
+        });
+
       setOrderPlaced(true);
       clearCart();
     } catch (error) {
@@ -228,18 +304,11 @@ const CheckoutPage: React.FC = () => {
                       </label>
                       <div className="flex items-center justify-between p-3 bg-primary/10 rounded-xl">
                         <span className="text-gray-900 dark:text-white font-medium text-xl">
-                          ${getTotal()}
+                          ${orderTotal.toFixed(2)}
                         </span>
                         <button
                           onClick={() =>
-                            copyToClipboard(
-                              (
-                                getTotal() +
-                                getTotal() * 0.08 +
-                                (getTotal() > 50 ? 0 : 5.99)
-                              ).toFixed(2),
-                              "amount"
-                            )
+                            copyToClipboard(orderTotal.toFixed(2), "amount")
                           }
                           className="text-primary hover:text-primary-dark"
                         >

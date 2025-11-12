@@ -22,7 +22,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
       <div className="space-y-2 mb-4">
         <div className="flex justify-between text-gray-600">
           <span>Subtotal ({getItemCount()} items)</span>
-          <span>₦{subtotal}</span>
+          <span>₦{subtotal.toLocaleString()}</span>
         </div>
 
         <div className="flex justify-between text-gray-600">
@@ -45,7 +45,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
       <div className="border-t pt-4">
         <div className="flex justify-between items-center text-lg font-bold text-puffy-dark">
           <span>Total</span>
-          <span>₦{total}</span>
+          <span>₦{total.toLocaleString()}</span>
         </div>
       </div>
 

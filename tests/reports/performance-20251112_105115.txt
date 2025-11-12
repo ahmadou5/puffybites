@@ -1,0 +1,15 @@
+Performance Test Results - 20251112_105115
+========================================
+
+Endpoint: /
+Response Time: 0.002029s
+Status: SUCCESS
+
+Endpoint: /order
+Response Time: 0.010613s
+Status: SUCCESS
+
+Endpoint: /admin
+Response Time: 0.004705s
+Status: SUCCESS
+
