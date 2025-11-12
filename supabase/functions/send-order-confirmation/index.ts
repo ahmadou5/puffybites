@@ -271,7 +271,7 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Puffy Delights <orders@puffydelights.com>',
+          from: 'Puffy Delights <onboarding@resend.dev>',
           to: [to],
           subject: `Order Confirmation #${orderId} - Your Puffy Delights are on the way! 🧁`,
           html: htmlContent,

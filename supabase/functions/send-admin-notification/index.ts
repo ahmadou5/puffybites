@@ -163,7 +163,7 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Puffy Delights System <system@puffydelights.com>',
+          from: 'Puffy Delights System <onboarding@resend.dev>',
           to: [adminEmail],
           subject: `🚨 New Order #${orderId} - ₦${total.toFixed(2)} from ${customerName}`,
           html: htmlContent,
