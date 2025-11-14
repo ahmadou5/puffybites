@@ -21,7 +21,11 @@ import {
 import CartSummary from "@/components/Cart/CartSummary";
 import CartItem from "@/components/Cart/CartItem";
 import type { CustomerInfo } from "@/types";
-
+interface BankDetail {
+  bankName: string;
+  accNumber: number;
+  accName: string;
+}
 const CheckoutPage: React.FC = () => {
   const { items, getTotal, clearCart } = useCart();
   const navigate = useNavigate();
@@ -52,6 +56,12 @@ const CheckoutPage: React.FC = () => {
     } else if (section === "delivery") {
       setDeliveryDate(value);
     }
+  };
+
+  const BankDetails: BankDetail = {
+    bankName: "Opay",
+    accNumber: 8132806808,
+    accName: "Hauwa Muhammad Samin",
   };
 
   const validateForm = (): boolean => {
@@ -233,11 +243,11 @@ const CheckoutPage: React.FC = () => {
                       </label>
                       <div className="flex items-center justify-between p-3 bg-primary/10 rounded-xl">
                         <span className="text-gray-900 dark:text-white font-medium">
-                          Puffy Delights Bank
+                          {BankDetails.bankName}
                         </span>
                         <button
                           onClick={() =>
-                            copyToClipboard("Puffy Delights Bank", "bank")
+                            copyToClipboard(`${BankDetails.bankName}`, "bank")
                           }
                           className="text-primary hover:text-primary-dark"
                         >
@@ -256,11 +266,14 @@ const CheckoutPage: React.FC = () => {
                       </label>
                       <div className="flex items-center justify-between p-3 bg-primary/10 rounded-xl">
                         <span className="text-gray-900 dark:text-white font-medium">
-                          1234567890
+                          {BankDetails.accNumber}
                         </span>
                         <button
                           onClick={() =>
-                            copyToClipboard("1234567890", "account")
+                            copyToClipboard(
+                              `${BankDetails.accNumber}`,
+                              "account"
+                            )
                           }
                           className="text-primary hover:text-primary-dark"
                         >
@@ -279,11 +292,11 @@ const CheckoutPage: React.FC = () => {
                       </label>
                       <div className="flex items-center justify-between p-3 bg-primary/10 rounded-xl">
                         <span className="text-gray-900 dark:text-white font-medium">
-                          Puffy Delights Ltd
+                          {BankDetails.accName}
                         </span>
                         <button
                           onClick={() =>
-                            copyToClipboard("Puffy Delights Ltd", "name")
+                            copyToClipboard(`${BankDetails.accName}`, "name")
                           }
                           className="text-primary hover:text-primary-dark"
                         >
@@ -304,11 +317,14 @@ const CheckoutPage: React.FC = () => {
                       </label>
                       <div className="flex items-center justify-between p-3 bg-primary/10 rounded-xl">
                         <span className="text-gray-900 dark:text-white font-medium text-xl">
-                          ${orderTotal.toFixed(2)}
+                          ${orderTotal.toLocaleString()}
                         </span>
                         <button
                           onClick={() =>
-                            copyToClipboard(orderTotal.toFixed(2), "amount")
+                            copyToClipboard(
+                              orderTotal.toLocaleString(),
+                              "amount"
+                            )
                           }
                           className="text-primary hover:text-primary-dark"
                         >

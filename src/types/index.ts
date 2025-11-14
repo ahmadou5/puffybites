@@ -80,6 +80,7 @@ export interface DessertFormData {
   pack_of: string;
   price_cents: string;
   image: string;
+  imageFile?: File | null;
   ingredients: string;
   tags: string;
   is_featured: boolean;

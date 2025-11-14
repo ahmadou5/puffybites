@@ -10,10 +10,10 @@ const Footer: React.FC = () => {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-sm">
-                <span className="text-white font-bold text-lg">P</span>
+                <span className="text-white font-bold text-lg">pb</span>
               </div>
               <span className="text-xl font-semibold text-black dark:text-white">
-                Puffy bites
+                Puffy Bites
               </span>
             </div>
             <p className="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
@@ -23,7 +23,7 @@ const Footer: React.FC = () => {
             </p>
             <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
               Made with <Heart className="w-4 h-4 mx-1 text-primary" /> by Puffy
-              Delights Team
+              Bites Team
             </div>
           </div>
 
@@ -35,56 +35,20 @@ const Footer: React.FC = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
                 <Phone size={16} />
-                <span>(555) 123-4567</span>
+                <span>+234 8132806808</span>
               </div>
-              <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
-                <Mail size={16} />
-                <span>hello@puffydelights.com</span>
-              </div>
+
               <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
                 <MapPin size={16} />
-                <span>123 Sweet Street, Dessert City</span>
+                <span>Karkasara Janbulo, Kano state</span>
               </div>
-            </div>
-          </div>
-
-          {/* Quick Links */}
-          <div>
-            <h3 className="font-semibold mb-4 text-black dark:text-white">
-              Quick Links
-            </h3>
-            <div className="space-y-2">
-              <a
-                href="#"
-                className="block text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light transition-colors"
-              >
-                About Us
-              </a>
-              <a
-                href="#"
-                className="block text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light transition-colors"
-              >
-                Our Story
-              </a>
-              <a
-                href="#"
-                className="block text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light transition-colors"
-              >
-                Ingredients
-              </a>
-              <a
-                href="#"
-                className="block text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light transition-colors"
-              >
-                Nutrition
-              </a>
             </div>
           </div>
         </div>
 
         <div className="border-t border-gray-200 dark:border-gray-800 mt-8 pt-8 text-center">
           <p className="text-gray-600 dark:text-gray-400">
-            &copy; 2024 Puffy Delights. All rights reserved.
+            &copy; 2025 Puffy Bites. All rights reserved.
           </p>
         </div>
       </div>

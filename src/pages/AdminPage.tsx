@@ -37,6 +37,11 @@ import {
   AreaChart,
 } from "recharts";
 import { dessertsAPI, ordersAPI } from "@/lib/supabase";
+import {
+  uploadImage,
+  validateImageFile,
+  type ImageUploadResult,
+} from "@/lib/imageUpload";
 import type { Dessert, Order, DessertFormData, OrderStats } from "@/types";
 
 type AdminTab = "desserts" | "orders" | "analytics";
@@ -51,6 +56,8 @@ const AdminPage: React.FC = () => {
   const [showAddForm, setShowAddForm] = useState<boolean>(false);
   const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null);
   const [orderFilter, setOrderFilter] = useState<string>("all");
+  const [uploadingImage, setUploadingImage] = useState<boolean>(false);
+  const [imagePreview, setImagePreview] = useState<string>("");
 
   const [dessertForm, setDessertForm] = useState<DessertFormData>({
     name: "",
@@ -58,6 +65,7 @@ const AdminPage: React.FC = () => {
     pack_of: "",
     price_cents: "",
     image: "",
+    imageFile: null,
     ingredients: "",
     tags: "",
     is_featured: false,
@@ -88,46 +96,98 @@ const AdminPage: React.FC = () => {
     e: React.FormEvent<HTMLFormElement>
   ): Promise<void> => {
     e.preventDefault();
+
     try {
+      let imageUrl = dessertForm.image;
+
+      // Handle image upload if a new file is selected
+      if (dessertForm.imageFile) {
+        setUploadingImage(true);
+
+        const uploadResult: ImageUploadResult = await uploadImage(
+          dessertForm.imageFile
+        );
+
+        if (uploadResult.error) {
+          alert(uploadResult.error);
+          setUploadingImage(false);
+          return;
+        }
+
+        imageUrl = uploadResult.url;
+        setUploadingImage(false);
+      }
+
       const dessertData = {
         ...dessertForm,
         price_cents: parseInt(dessertForm.price_cents),
         pack_of: parseInt(dessertForm.pack_of),
+        image: imageUrl,
         tags: dessertForm.tags
           .split(",")
           .map((tag) => tag.trim())
           .filter(Boolean),
       };
 
+      // Remove imageFile from the data being sent to API
+      const { imageFile, ...apiData } = dessertData;
+
       if (editingDessert) {
-        const updated = await dessertsAPI.update(
-          editingDessert.id,
-          dessertData
-        );
+        const updated = await dessertsAPI.update(editingDessert.id, apiData);
         setDesserts((prev) =>
           prev.map((d) => (d.id === editingDessert.id ? updated : d))
         );
         setEditingDessert(null);
       } else {
-        const newDessert = await dessertsAPI.create(dessertData);
+        const newDessert = await dessertsAPI.create(apiData);
         setDesserts((prev) => [newDessert, ...prev]);
         setShowAddForm(false);
       }
 
+      // Reset form
       setDessertForm({
         name: "",
         description: "",
         pack_of: "",
         price_cents: "",
         image: "",
+        imageFile: null,
         ingredients: "",
         tags: "",
         is_featured: false,
         in_stock: true,
       });
+      setImagePreview("");
     } catch (error) {
       console.error("Error saving dessert:", error);
       alert("Error saving dessert. Please try again.");
+      setUploadingImage(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate the file
+      const validation = validateImageFile(file);
+      if (!validation.valid) {
+        alert(validation.error);
+        e.target.value = ""; // Reset file input
+        return;
+      }
+
+      setDessertForm((prev) => ({
+        ...prev,
+        imageFile: file,
+        image: "", // Clear any existing URL since we're uploading a new file
+      }));
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setImagePreview(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -139,11 +199,13 @@ const AdminPage: React.FC = () => {
       pack_of: dessert.pack_of.toString(),
       price_cents: dessert.price_cents.toString(),
       image: dessert.image || "",
+      imageFile: null,
       ingredients: dessert.ingredients || "",
       tags: Array.isArray(dessert.tags) ? dessert.tags.join(", ") : "",
       is_featured: dessert.is_featured,
       in_stock: dessert.in_stock,
     });
+    setImagePreview(dessert.image || "");
   };
 
   const handleDeleteDessert = async (id: number): Promise<void> => {
@@ -318,11 +380,13 @@ const AdminPage: React.FC = () => {
       pack_of: "",
       price_cents: "",
       image: "",
+      imageFile: null,
       ingredients: "",
       tags: "",
       is_featured: false,
       in_stock: true,
     });
+    setImagePreview("");
   };
 
   if (loading) {
@@ -336,31 +400,22 @@ const AdminPage: React.FC = () => {
   }
 
   return (
-    <div className="py-12 min-h-screen px-5 lg:px-8">
+    <div className="py-20 min-h-screen px-5 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-12">
           <div className="flex justify-between items-start mb-6">
             <div>
               <h1 className="text-2xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-2">
-                Admin Dashboard
+                Dashboard
               </h1>
               <p className="lg:text-xl text-base text-gray-600 dark:text-gray-400 leading-relaxed">
                 Manage your puffies and view orders
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <div className="text-right">
-                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
-                  <User className="w-4 h-4" />
-                  <span>Welcome back!</span>
-                </div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {user?.email}
-                </p>
-              </div>
               <button
                 onClick={signOut}
-                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200"
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-2xl transition-colors duration-200"
               >
                 <LogOut className="w-4 h-4" />
                 <span className="hidden sm:inline">Sign Out</span>
@@ -547,18 +602,57 @@ const AdminPage: React.FC = () => {
                       />
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input
-                          type="text"
-                          placeholder="Image URL"
-                          value={dessertForm.image}
-                          onChange={(e) =>
-                            setDessertForm((prev) => ({
-                              ...prev,
-                              image: e.target.value,
-                            }))
-                          }
-                          className="w-full lg:p-4 p-2 border border-primary/30 rounded-2xl bg-primary/10 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
-                        />
+                        {/* Image Upload Section */}
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Product Image
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleFileChange}
+                              disabled={uploadingImage}
+                              className="w-full lg:p-4 p-2 border border-primary/30 rounded-2xl bg-primary/10 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/80 disabled:opacity-50"
+                            />
+                            {uploadingImage && (
+                              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary border-t-transparent"></div>
+                              </div>
+                            )}
+                          </div>
+                          {/* Image Preview */}
+                          {imagePreview && (
+                            <div className="relative w-32 h-32 border-2 border-gray-300 rounded-lg overflow-hidden">
+                              <img
+                                src={imagePreview}
+                                alt="Preview"
+                                className="w-full h-full object-cover"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setImagePreview("");
+                                  setDessertForm((prev) => ({
+                                    ...prev,
+                                    imageFile: null,
+                                    image: editingDessert
+                                      ? editingDessert.image || ""
+                                      : "",
+                                  }));
+                                }}
+                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          )}
+                          <p className="text-xs text-gray-500">
+                            Supported formats: JPEG, PNG, WebP, GIF. Max size:
+                            5MB
+                          </p>
+                        </div>
+
                         <input
                           type="text"
                           placeholder="Tags (comma separated)"
@@ -599,7 +693,7 @@ const AdminPage: React.FC = () => {
                             }
                             className="mr-2"
                           />
-                          Featured Dessert
+                          Featured Puffy
                         </label>
                         <label className="flex items-center">
                           <input
@@ -620,12 +714,22 @@ const AdminPage: React.FC = () => {
                       <div className="flex space-x-4">
                         <button
                           type="submit"
-                          className="btn-primary flex items-center space-x-2"
+                          disabled={uploadingImage}
+                          className="btn-primary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          <Save size={18} />
-                          <span>
-                            {editingDessert ? "Update" : "Add"} Dessert
-                          </span>
+                          {uploadingImage ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                              <span>Uploading Image...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Save size={18} />
+                              <span>
+                                {editingDessert ? "Update" : "Add"} Puffy
+                              </span>
+                            </>
+                          )}
                         </button>
                         <button
                           type="button"
@@ -638,11 +742,14 @@ const AdminPage: React.FC = () => {
                               pack_of: "",
                               price_cents: "",
                               image: "",
+                              imageFile: null,
                               ingredients: "",
                               tags: "",
                               is_featured: false,
                               in_stock: true,
                             });
+                            setImagePreview("");
+                            setUploadingImage(false);
                           }}
                           className="bg-red-600/50 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
                         >

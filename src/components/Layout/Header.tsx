@@ -20,7 +20,7 @@ const Header: React.FC = () => {
   const navigation: NavigationItem[] = [
     { name: "Home", href: "/" },
     { name: "Order", href: "/order" },
-    { name: "Admin", href: "/admin" },
+    { name: "Dashboard", href: "/admin" },
   ];
 
   const isActive = (path: string): boolean => location.pathname === path;

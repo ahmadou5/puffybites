@@ -11,16 +11,13 @@ const OrderPage: React.FC = () => {
   const [filteredDesserts, setFilteredDesserts] = useState<Dessert[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string | number>(10);
   const [sortBy, setSortBy] = useState<SortOption>("name");
 
   const categories: Category[] = [
-    { id: "all", name: "All Desserts" },
-    { id: "cake", name: "Cakes" },
-    { id: "tart", name: "Tarts" },
-    { id: "éclair", name: "Éclairs" },
-    { id: "cookie", name: "Cookies" },
-    { id: "ice-cream", name: "Ice Cream" },
+    { id: "all", name: "All Puff-puffs" },
+    { id: "c", name: "Party Pack" },
+    { id: "tart", name: "Pack of 15" },
   ];
 
   useEffect(() => {
@@ -57,9 +54,9 @@ const OrderPage: React.FC = () => {
     }
 
     // Filter by category
-    if (selectedCategory !== "all") {
-      filtered = filtered.filter((dessert) =>
-        dessert.tags?.includes(selectedCategory)
+    if (selectedCategory !== 10) {
+      filtered = filtered.filter(
+        (dessert) => dessert.pack_of === selectedCategory
       );
     }
 
@@ -88,10 +85,10 @@ const OrderPage: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-            Our Dessert Menu
+            Our Puffy Menu
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
-            Discover our complete collection of handcrafted desserts
+            Discover our complete collection of our creamy puff-puffs
           </p>
         </div>
 
@@ -106,7 +103,7 @@ const OrderPage: React.FC = () => {
                 </div>
                 <input
                   type="text"
-                  placeholder="Search desserts..."
+                  placeholder="Search puffies..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-12 pr-4 py-3.5 bg-primary/10 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary focus:bg-primary/5 transition-all duration-300 ease-in-out"
